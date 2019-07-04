@@ -1,5 +1,5 @@
 {
-  "name": "ccxws",
+  "name": "dknafo-ccxws",
   "version": "0.24.1",
   "description": "Websocket client for 20+ cryptocurrency exchanges",
   "keywords": [
@@ -18,7 +18,10 @@
     "test": "jest --testEnvironment=node --testRunner=jest-circus/runner --coverage --testPathPattern=src/.+\\.spec\\.js --maxWorkers=32",
     "test:ci": "jest --testEnvironment=node --testRunner=jest-circus/runner --coverage --testPathPattern=src/.+\\.spec\\.js --maxWorkers=32 && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
-  "repository": "altangent/ccxws",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d-knafo/ccxws.git"
+  },
   "dependencies": {
     "cloudscraper": "^1.5.1",
     "decimal.js": "^10.1.1",
@@ -37,5 +40,9 @@
     "jest": "^24.5.0",
     "jest-circus": "^24.5.0",
     "prettier": "^1.16.4"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/altangent/ccxws/issues"
+  },
+  "homepage": "https://github.com/d-knafo/ccxws.git#readme"
 }
