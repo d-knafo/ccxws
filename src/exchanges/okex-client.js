@@ -199,7 +199,7 @@ class OKExClient extends BasicClient {
 
     if (msg.table == 'futures/ticker') {
         let ticker = this._constructTicker(msg, msg.data.instrument_id);
-        this.emit("ticker", ticker, market);
+        this.emit("ticker", ticker, 'stam :)');
         return;
     }
 
