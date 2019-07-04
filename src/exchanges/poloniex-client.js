@@ -228,20 +228,20 @@ class PoloniexClient extends BasicClient {
     if (id === 1002 && updates) {
       let remoteId = MARKET_IDS[updates[0]];
       let market = this._tickerSubs.get(remoteId);
-      
+
       /* start david changes */
      if (!market) {
           this._tickerSubs.set(remoteId, updates[0]);
            market = this._tickerSubs.get(remoteId);
-      };
+      }
 
       if(poloniexPairs.includes(remoteId)) { // "poloniexPairs" its defined in a globlal in file  // david change
         let ticker = this._createTicker(updates, market);
-        this.emit("ticker", ticker, market); 
+        this.emit("ticker", ticker, market);
       }
       return;
        /* end david changes */
-      // old : 
+      // old :
       //if (!market) { return }
 
     }

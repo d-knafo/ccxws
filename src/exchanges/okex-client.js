@@ -9,7 +9,12 @@ const Level2Update = require("../level2-update");
 
 class OKExClient extends BasicClient {
   constructor() {
-    super("wss://real.okex.com:10441/websocket", "OKEx");
+
+    /* start david changes */
+    super("wss://real.okex.com:10442/ws/v3", "OKEx");
+      // old super("wss://real.okex.com:10441/websocket", "OKEx");
+    /* end david changes */
+
     this.on("connected", this._resetSemaphore.bind(this));
     this.on("connected", this._startPing.bind(this));
     this.on("disconnected", this._stopPing.bind(this));
@@ -32,7 +37,7 @@ class OKExClient extends BasicClient {
   _stopPing() {
     clearInterval(this._pingInterval)
   }
-  
+
   _sendPing() {
     if (this._wss) {
       this._wss.send(JSON.stringify({ event: "ping" }));
@@ -42,10 +47,15 @@ class OKExClient extends BasicClient {
   _sendSubTicker(remote_id) {
     this._sem.take(() => {
       this._wss.send(
-        JSON.stringify({
-          event: "addChannel",
-          channel: `ok_sub_spot_${remote_id}_ticker`,
-        })
+        /* start david changes */
+          // JSON.stringify({
+          //   event: "addChannel",
+          //   channel: `ok_sub_spot_${remote_id}_ticker`,
+          // })
+          JSON.stringify({
+            "op": "subscribe", "args":[remote_id]
+          })
+        /* end david changes */
       );
     });
   }
@@ -185,21 +195,31 @@ class OKExClient extends BasicClient {
       return;
     }
 
-    if (!msg.channel) {
-      if (msg.event !== "pong") console.log(msg);
-      return;
+    /* start david changes */
+
+    if (msg.table == 'futures/ticker') {
+        let ticker = this._constructTicker(msg, msg.data.instrument_id);
+        this.emit("ticker", ticker, market);
+        return;
     }
 
-    // tickers
-    if (msg.channel.endsWith("_ticker")) {
-      let remoteId = msg.channel.substr("ok_sub_spot_".length).replace("_ticker", "");
-      let market = this._tickerSubs.get(remoteId);
-      if (!market) return;
+    // if (!msg.channel) {
+    //   if (msg.event !== "pong") console.log(msg);
+    //   return;
+    // }
+    //
+    // // tickers
+    // if (msg.channel.endsWith("_ticker")) {
+    //   let remoteId = msg.channel.substr("ok_sub_spot_".length).replace("_ticker", "");
+    //   let market = this._tickerSubs.get(remoteId);
+    //   if (!market) return;
+    //
+    //   let ticker = this._constructTicker(msg, market);
+    //   this.emit("ticker", ticker, market);
+    //   return;
+    // }
 
-      let ticker = this._constructTicker(msg, market);
-      this.emit("ticker", ticker, market);
-      return;
-    }
+    /* end david changes */
 
     // l2 snapshots
     if (msg.channel.endsWith("_5") || msg.channel.endsWith("_10") || msg.channel.endsWith("_20")) {
@@ -248,23 +268,47 @@ class OKExClient extends BasicClient {
       open: '0.06929546',
       timestamp: 1531692991115 } }
      */
-    let { open, vol, last, buy, change, sell, dayLow, dayHigh, timestamp } = msg.data;
-    let dayChangePercent = (parseFloat(change) / parseFloat(open)) * 100;
+
+    /* start david changes */
+
+    // let { open, vol, last, buy, change, sell, dayLow, dayHigh, timestamp } = msg.data;
+    // let dayChangePercent = (parseFloat(change) / parseFloat(open)) * 100;
+    // return new Ticker({
+    //   exchange: "OKEx",
+    //   base: market.base,
+    //   quote: market.quote,
+    //   timestamp,
+    //   last,
+    //   open,
+    //   high: dayHigh,
+    //   low: dayLow,
+    //   volume: vol,
+    //   change: change,
+    //   changePercent: dayChangePercent.toFixed(2),
+    //   bid: buy,
+    //   ask: sell,
+    // });
+
+    let { open_24h, volume_token_24h, last, best_bid, change, best_ask, low_24h, high_24h, timestamp, volume_24h} = msg.data[0];
     return new Ticker({
-      exchange: "OKEx",
-      base: market.base,
-      quote: market.quote,
-      timestamp,
-      last,
-      open,
-      high: dayHigh,
-      low: dayLow,
-      volume: vol,
-      change: change,
-      changePercent: dayChangePercent.toFixed(2),
-      bid: buy,
-      ask: sell,
-    });
+          exchange: "OKEx",
+          base: market,
+          quote: 'market.quote',
+          timestamp,
+          last,
+          open: open_24h,
+          high: high_24h,
+          low: low_24h,
+          volume: volume_token_24h,
+          change: change,
+          quoteVolume:volume_24h,
+          // changePercent: dayChangePercent.toFixed(2),
+          bid: best_bid,
+          ask: best_ask,
+      });
+
+      /* end david changes */
+
   }
 
   _constructTradesFromMessage(datum, market) {
