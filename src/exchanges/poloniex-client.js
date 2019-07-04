@@ -235,7 +235,12 @@ class PoloniexClient extends BasicClient {
            market = this._tickerSubs.get(remoteId);
       }
 
-      if(poloniexPairs.includes(remoteId)) { // "poloniexPairs" its defined in a globlal in file  // david change
+      let newArr = [] ;
+      poloniexPairs.forEach( (ele) => {
+        newArr.push(ele.pair)
+      })
+
+      if(newArr.includes(remoteId)) { // "poloniexPairs" its defined in a globlal in file  // david change
         let ticker = this._createTicker(updates, market);
         this.emit("ticker", ticker, market);
       }
