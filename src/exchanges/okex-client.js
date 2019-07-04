@@ -219,35 +219,36 @@ class OKExClient extends BasicClient {
     //   return;
     // }
 
-    /* end david changes */
 
-    // l2 snapshots
-    if (msg.channel.endsWith("_5") || msg.channel.endsWith("_10") || msg.channel.endsWith("_20")) {
-      let remote_id = msg.channel.replace("ok_sub_spot_", "").replace(/_depth_\d+/, "");
-      let market = this._level2SnapshotSubs.get(remote_id) || this._level2UpdateSubs.get(remote_id);
-      if (!market) return;
+      // // l2 snapshots
+      // if (msg.channel.endsWith("_5") || msg.channel.endsWith("_10") || msg.channel.endsWith("_20")) {
+      //   let remote_id = msg.channel.replace("ok_sub_spot_", "").replace(/_depth_\d+/, "");
+      //   let market = this._level2SnapshotSubs.get(remote_id) || this._level2UpdateSubs.get(remote_id);
+      //   if (!market) return;
+      //
+      //   let snapshot = this._constructLevel2Snapshot(msg, market);
+      //   this.emit("l2snapshot", snapshot, market);
+      //   return;
+      // }
+      //
+      // // l2 updates
+      // if (msg.channel.endsWith("depth")) {
+      //   let remote_id = msg.channel.replace("ok_sub_spot_", "").replace("_depth", "");
+      //   let market = this._level2UpdateSubs.get(remote_id);
+      //   if (!market) return;
+      //
+      //   if (!this._hasSnapshot.has(remote_id)) {
+      //     let snapshot = this._constructLevel2Snapshot(msg, market);
+      //     this.emit("l2snapshot", snapshot, market);
+      //     this._hasSnapshot.add(remote_id);
+      //   } else {
+      //     let update = this._constructoL2Update(msg, market);
+      //     this.emit("l2update", update, market);
+      //   }
+      //   return;
+      // }
 
-      let snapshot = this._constructLevel2Snapshot(msg, market);
-      this.emit("l2snapshot", snapshot, market);
-      return;
-    }
-
-    // l2 updates
-    if (msg.channel.endsWith("depth")) {
-      let remote_id = msg.channel.replace("ok_sub_spot_", "").replace("_depth", "");
-      let market = this._level2UpdateSubs.get(remote_id);
-      if (!market) return;
-
-      if (!this._hasSnapshot.has(remote_id)) {
-        let snapshot = this._constructLevel2Snapshot(msg, market);
-        this.emit("l2snapshot", snapshot, market);
-        this._hasSnapshot.add(remote_id);
-      } else {
-        let update = this._constructoL2Update(msg, market);
-        this.emit("l2update", update, market);
-      }
-      return;
-    }
+        /* end david changes */
   }
 
   _constructTicker(msg, market) {
